@@ -58,7 +58,7 @@ void loop() {
     int spindle_enabled = digitalRead(SPINDLE_ENABLE_PIN);  // Marlin spindle power control
 
     unsigned long rpm_math = (60000000 / rpm_value) - 1;    // Spindle, interrupt microseconds to RPM
-    int optical_pwm = (rpm_math / MAX_TOOL_RPM) * 255;      // Spindle, RPM to PWM
+    int optical_pwm = rpm_math * 255 / MAX_TOOL_RPM;        // Spindle, RPM to PWM
     Serial.print("RPM = ");                                 // Spindle, Display RPM ---LCD
     Serial.println(rpm_math);                               // Spindle, Display RPM ---LCD
 
