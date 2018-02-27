@@ -1,5 +1,5 @@
 /*
- * PWM PID control using an optical sensor and a PWM enable AC triac power control, LCD control....More info as this hopefully progresses.
+ * PWM PID control using an optical sensor, a PWM enable AC triac power control, LCD panel....more info soon.
  * 
  * Details for now, https://www.v1engineering.com/forum/topic/hardware-needed-for-a-software-fix/
  * 
