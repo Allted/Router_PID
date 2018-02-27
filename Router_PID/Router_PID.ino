@@ -59,34 +59,35 @@ void setup()
 
 void loop() {
 
-    int spindle_enabled = digitalRead(SPINDLE_ENABLE_PIN);  // Marlin spindle power control
+    int spindle_enabled = digitalRead(SPINDLE_ENABLE_PIN);          // Marlin spindle power control
 
     // Compute the spindle's RPM value.
     unsigned long rpm_math = (US_PERIOD_TO_RPM / rpm_value) - 1;    // Spindle, interrupt microseconds to RPM
-    int optical_pwm = rpm_math * 255 / MAX_TOOL_RPM;        // Spindle, RPM to PWM
+    int optical_pwm = rpm_math * 255 / MAX_TOOL_RPM;                // Spindle, RPM to PWM
 
-    Serial.print("RPM = ");                                 // Spindle, Display RPM ---LCD
-    Serial.println(rpm_math);                               // Spindle, Display RPM ---LCD
+    Serial.print("RPM = ");                                         // Spindle, Display RPM ---LCD
+    Serial.println(rpm_math);                                       // Spindle, Display RPM ---LCD
 
     // Set the output to the speed controller.
-    if (spindle_enabled == 0) {                             // Marlin is spindle off?
-        pwm_value = 0;                                      // Reset set point
-        analogWrite(ROUTER_PWM_OUT_PIN, 0);                 // Turn off Spindle AC
-        my_pid.SetMode(MANUAL);                             // Reset PID
+    if (spindle_enabled == 0) {                                     // Marlin is spindle off?
+        pwm_value = 0;                                              // Reset set point
+        analogWrite(ROUTER_PWM_OUT_PIN, 0);                         // Turn off Spindle AC
+        my_pid.SetMode(MANUAL);                                     // Reset PID
     }
-    else {                                                  // If spindle is enabled write PID value to triac
+    else {                                                          // If spindle is enabled write PID value to triac
 
         if (my_pid.GetMode() == MANUAL) {
             // TODO, if you want actual manual control, then we will need to not do this step.
-            my_pid.SetMode(AUTOMATIC);                      // Turn the PID back on
+            // Depending on the LCD stuff.
+            my_pid.SetMode(AUTOMATIC);                              // Turn the PID back on
         }
 
         // One iteration of the PID.
-        input = optical_pwm;                                    // PID Input from router
-        set_point = map(pwm_value, 0, MAX_PWM_INPUT_US, 0, 255);// PID SetPoint from Marlin
-        my_pid.Compute();                                       // PID Run the Loop
+        input = optical_pwm;                                        // PID Input from router
+        set_point = map(pwm_value, 0, MAX_PWM_INPUT_US, 0, 255);    // PID SetPoint from Marlin
+        my_pid.Compute();                                           // PID Run the Loop
 
-        analogWrite(ROUTER_PWM_OUT_PIN, output);            // Out to AC control Triac
+        analogWrite(ROUTER_PWM_OUT_PIN, output);                    // Out to AC control Triac
     }
 }
 
