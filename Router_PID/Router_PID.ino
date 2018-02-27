@@ -87,14 +87,21 @@ void spindleRPM() {
 // rising() is called on the rising edge of PWM_PIN. Basically starts the timer for measuring the
 // PWM duty cycle. ISR.
 void rising() {                                                      // Marlin check incoming PWM
-    attachInterrupt(digitalPinToInterrupt(PWM_PIN), falling, FALLING);
+    // Capture when this is rising.
     prev_time = micros();
+
+    // Set the next interrupt.
+    attachInterrupt(digitalPinToInterrupt(PWM_PIN), falling, FALLING);
 }
 
 // falling() is called on the falling edge of PWM_PIN. Records the amount of time since the
 // rising(). ISR.
 void falling() {
-    attachInterrupt(digitalPinToInterrupt(PWM_PIN), rising, RISING);
+    // Measure the time since the last rising edge, in microseconds.
     pwm_value = micros() - prev_time;
+
+    // Set the next interrupt.
+    attachInterrupt(digitalPinToInterrupt(PWM_PIN), rising, RISING);
+
     //Serial.println(pwm_value);                                      // For debugging the PWM MAP
 }
