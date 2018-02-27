@@ -15,9 +15,9 @@ volatile unsigned long rpm_value = 60000000;  //Spindle RPM input in microsecond
 unsigned long RPMmath;                        //Spindle interrupt to RPM
 int opticalPWM;                               //Spindle RPM to PWM
 
-const int PWM_PIN = 2;                        //Marlin PWM Input pin
-volatile unsigned long pwm_value;             //Marlin PWM value in microseconds
-volatile unsigned long prev_time = 0;         //Marlin PWM Math
+const int PWM_PIN = 2;                        //Marlin PWMms Input pin
+volatile unsigned long pwm_value;             //Marlin PWMms value in microseconds
+volatile unsigned long prev_time = 0;         //Marlin PWMms Math
 
 const int SpindleEnablePIN = 5;               //Marlin Spindle enabled pin 
 int spindleEnable = 0;                        //Marlin Spindle enabled value
@@ -55,11 +55,6 @@ void loop() {
 
    spindleEnable = digitalRead(SpindleEnablePIN);      //Marlin spindle power control
     
-      if (spindleEnable == 0){                         //Marlin is spindle off?
-       pwm_value = 0;                                  //Reset PID
-       analogWrite(routerPWMout, 0);                   //Turn off Spindle AC
-       }
-   
    RPMmath = (60000000 / rpm_value) - 1;               //Spindle, interrupt microseconds to RPM
    opticalPWM = (RPMmath / ToolRPM) * 255;             //Spindle, RPM to PWM
    Serial.print("RPM = ");                             //Spindle, Display RPM ---LCD
@@ -70,7 +65,14 @@ void loop() {
    Input = opticalPWM;                                 //PID Input from router
    Setpoint = MarlinConverted;                         //PID SetPoint from Marlin
    myPID.Compute();                                    //PID Run the Loop
-   analogWrite(routerPWMout, Output);                  //Out to AC control Triac
+
+   if (spindleEnable == 0){                            //Marlin is spindle off?
+       pwm_value = 0;                                  //Reset PID
+       analogWrite(routerPWMout, 0);                   //Turn off Spindle AC
+       }
+    else{                                              //If spindle is enabled write PID value to triac
+       analogWrite(routerPWMout, Output);              //Out to AC control Triac
+       }
 }
 
 void spindleRPM() {                                                  //Optical RPM sensor in microseconds
