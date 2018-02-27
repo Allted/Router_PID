@@ -50,8 +50,9 @@ void setup()
 
     analogWrite(ROUTER_PWM_OUT_PIN,0);                                   // Triac initial state = off safety?
 
-    my_pid.SetMode(AUTOMATIC);                                           // PID auto/manual *TODO change with lcd button
-    my_pid.SetSampleTime(16.6);                                          // PID Loop time this is faster than 60Hz Double check
+    my_pid.SetMode(MANUAL);                                              // PID auto/manual *TODO change with lcd button
+    const double SAMPLE_TIME_MS = 16.6;                                  // PID Loop Period, in ms. 16.6 is just faster than 60Hz.
+    my_pid.SetSampleTime(SAMPLE_TIME_MS);                                // PID Loop time
 
     Serial.begin(9600);
 }
@@ -67,17 +68,24 @@ void loop() {
     Serial.print("RPM = ");                                 // Spindle, Display RPM ---LCD
     Serial.println(rpm_math);                               // Spindle, Display RPM ---LCD
 
-    // One iteration of the PID.
-    input = optical_pwm;                                    // PID Input from router
-    set_point = map(pwm_value, 0, MAX_PWM_INPUT_US, 0, 255);// PID SetPoint from Marlin
-    my_pid.Compute();                                       // PID Run the Loop
-
     // Set the output to the speed controller.
     if (spindle_enabled == 0) {                             // Marlin is spindle off?
-        pwm_value = 0;                                      // Reset PID
+        pwm_value = 0;                                      // Reset set point
         analogWrite(ROUTER_PWM_OUT_PIN, 0);                 // Turn off Spindle AC
+        my_pid.SetMode(MANUAL);                             // Reset PID
     }
     else {                                                  // If spindle is enabled write PID value to triac
+
+        if (my_pid.GetMode() == MANUAL) {
+            // TODO, if you want actual manual control, then we will need to not do this step.
+            my_pid.SetMode(AUTOMATIC);                      // Turn the PID back on
+        }
+
+        // One iteration of the PID.
+        input = optical_pwm;                                    // PID Input from router
+        set_point = map(pwm_value, 0, MAX_PWM_INPUT_US, 0, 255);// PID SetPoint from Marlin
+        my_pid.Compute();                                       // PID Run the Loop
+
         analogWrite(ROUTER_PWM_OUT_PIN, output);            // Out to AC control Triac
     }
 }
