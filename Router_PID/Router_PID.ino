@@ -25,8 +25,6 @@ int MarlinConverted;                          //Marlin PWM value
 
 const int routerPWMout = 11;                  //Triac output to router
 
-
-
 double Setpoint, Input, Output;                            //PID variables
 double Kp=1.8, Ki=7.4, Kd=.215;                            //PID P.I.D.
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT); //PID library
@@ -57,9 +55,7 @@ void loop() {
     
    RPMmath = (60000000 / rpm_value) - 1;               //Spindle, interrupt microseconds to RPM
    opticalPWM = (RPMmath / ToolRPM) * 255;             //Spindle, RPM to PWM
-   Serial.print("RPM = ");                             //Spindle, Display RPM ---LCD
-   Serial.println(RPMmath);                            //Spindle, Display RPM ---LCD
-          
+             
    MarlinConverted = map(pwm_value, 0, 2024, 0, 255);  //Marlin, scale PWM_ms to pwm value
    
    Input = opticalPWM;                                 //PID Input from router
@@ -70,9 +66,12 @@ void loop() {
        pwm_value = 0;                                  //Reset PID
        analogWrite(routerPWMout, 0);                   //Turn off Spindle AC
        }
-    else{                                              //If spindle is enabled write PID value to triac
+    else {                                             //If spindle is enabled write PID value to triac
        analogWrite(routerPWMout, Output);              //Out to AC control Triac
        }
+   
+      Serial.print("RPM = ");                          //Spindle, Display RPM
+      Serial.println(RPMmath);                         //Spindle, Display RPM
 }
 
 void spindleRPM() {                                                  //Optical RPM sensor in microseconds
