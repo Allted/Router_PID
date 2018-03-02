@@ -32,9 +32,9 @@ double Kp=1.8;
 double Ki=7.4;
 double Kd=.215;
 
-PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT); // PID library
+PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);                   // PID library
 
-float MAX_TOOL_RPM = 30000;                                // SETTINGS per "spindle" ?1k headroom needed?
+float MAX_TOOL_RPM = 30000;                                                  // SETTINGS per "spindle" ?1k headroom needed?
 
 void setup()
 {
@@ -59,7 +59,7 @@ void loop() {
    int spindle_enable = digitalRead(SPINDLE_ENABLE_PIN); // Marlin spindle power control
     
    unsigned long rpm_math = (60000000 / rpm_value) - 1;  // Spindle, interrupt microseconds to RPM
-   int optical_pwm = (rpm_math / MAX_TOOL_RPM) * 255;    // Spindle, RPM to PWM
+   int optical_pwm = rpm_math * 255 / MAX_TOOL_RPM;      // Spindle, RPM to PWM
              
    Input = optical_pwm;                                  // PID Input from router
    Setpoint = map(pwm_value, 0, 2024, 0, 255);           // PID setpoit from Marlin
