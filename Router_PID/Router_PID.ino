@@ -86,17 +86,23 @@ void spindleRPM() {
    attachInterrupt(digitalPinToInterrupt(PHOTO_PIN), spindleRPM, FALLING);
    }
 
-// rising() is called on the rising edge of the PHOTO_PIN. Basically starts teh timer for measuring the
+// rising() is called on the rising edge of the PHOTO_PIN. Basically starts the timer for measuring the
 // PWM duty cycle. ISR.
 void rising() {
-   attachInterrupt(digitalPinToInterrupt(PWM_PIN), falling, FALLING);
+   // Capture when this is rising.
    prev_time = micros();
+
+   // Set teh next interrupt.
+   attachInterrupt(digitalPinToInterrupt(PWM_PIN), falling, FALLING);
    }
 
-// falling() is called on the falling edgeof the PWM_PIN. Records teh amount of time since the
+// falling() is called on the falling edgeof the PWM_PIN. Records the amount of time since the
 // rising(). ISR.  
  void falling() {
-   attachInterrupt(digitalPinToInterrupt(PWM_PIN), rising, RISING);
+   // Measure the time since teh last rising edge, in microseconds.
    pwm_value = micros()-prev_time;
+
+   // Set the next interrupt.
+   attachInterrupt(digitalPinToInterrupt(PWM_PIN), rising, RISING);
    //Serial.println(pwm_value);                                      // For debugging the PWM MAP
   }
