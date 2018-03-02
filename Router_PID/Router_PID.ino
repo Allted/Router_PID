@@ -75,18 +75,18 @@ void loop() {
 }
 
 void spindleRPM() {                                                  // Optical RPM sensor in microseconds
-  current_rpm_time = micros();
-  rpm_value = current_rpm_time - prev_rpmTime;
-  prev_rpmTime = current_rpm_time;
-  attachInterrupt(digitalPinToInterrupt(Photo), spindleRPM, FALLING);
-  }
+   current_rpm_time = micros();
+   rpm_value = current_rpm_time - prev_rpmTime;
+   prev_rpmTime = current_rpm_time;
+   attachInterrupt(digitalPinToInterrupt(Photo), spindleRPM, FALLING);
+   }
 
 void rising() {                                                      // Marlin check incoming PWM
-  attachInterrupt(digitalPinToInterrupt(PWM_PIN), falling, FALLING);
-  prev_time = micros();
-  }
+   attachInterrupt(digitalPinToInterrupt(PWM_PIN), falling, FALLING);
+   prev_time = micros();
+   }
  void falling() {
-  attachInterrupt(digitalPinToInterrupt(PWM_PIN), rising, RISING);
-  pwm_value = micros()-prev_time;
-  //Serial.println(pwm_value);                                      // For debugging the PWM MAP
+   attachInterrupt(digitalPinToInterrupt(PWM_PIN), rising, RISING);
+   pwm_value = micros()-prev_time;
+   //Serial.println(pwm_value);                                      // For debugging the PWM MAP
   }
