@@ -61,7 +61,7 @@ void loop() {
    int spindle_enable = digitalRead(SPINDLE_ENABLE_PIN);     // Marlin spindle power control
     
    // Compute the spindle's RPM value.
-   unsigned long rpm_math = US_PERIOD_TO_RPM / rpm_value;    // Spindle, interrupt microseconds to RPM
+   unsigned long rpm_math = (US_PERIOD_TO_RPM / rpm_value)-1;// Spindle, interrupt microseconds to RPM
    unsigned int optical_pwm = rpm_math * 255 / MAX_TOOL_RPM; // Spindle, RPM to PWM
              
    // One iteration of the PID.
@@ -73,6 +73,7 @@ void loop() {
    if (spindle_enable == 0){                                 // Marlin is spindle off?
        pwm_value = 0;                                        // Reset PID
        analogWrite(ROUTER_PWM_OUTPIN, 0);                    // Turn off Spindle AC
+       rpm_value = US_PERIOD_TO_RPM;                         // Disregards the spindown but clears the PID
        }
     else {                                                   // If spindle is enabled write PID value to triac
        analogWrite(ROUTER_PWM_OUTPIN, Output);               // Out to AC control Triac
