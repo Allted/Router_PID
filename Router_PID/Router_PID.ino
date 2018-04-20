@@ -30,8 +30,8 @@ double Output = 0.0;
 
 //PID Gains
 double Kp=1.8;
-double Ki=7.4;
-double Kd=.215;
+double Ki=12;
+double Kd=0.2;
 
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);                   // PID library
 
