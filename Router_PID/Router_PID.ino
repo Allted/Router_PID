@@ -7,6 +7,7 @@
  */
 
 #include <PID_v1.h>                                  // Arduino library PID Library by Brett Beauregard
+#include <LiquidCrystal.h>                           // LCD Library
 
 const long US_PERIOD_TO_RPM = 60000000;              // Convert from us of one rotation to RPM.
 
@@ -21,7 +22,13 @@ volatile unsigned long prev_time = 0;                // Marlin PWMms Math
 
 const int SPINDLE_ENABLE_PIN = 5;                    // Marlin Spindle enabled pin 
 
-const int ROUTER_PWM_OUTPIN = 11;                    // Triac output to router
+const int ROUTER_PWM_OUTPIN = 6;                     // Triac output to router
+
+const int rs = 11, en = 12, d4 = 10, d5 = 9, d6 = 8, d7 = 7; // Initialize LCD pins
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);                   // LCD library pins
+volatile unsigned long current_lcd_time = 0;                 // LCD refresh timer
+volatile unsigned long prev_lcd_time = 0;                    // LCD refresh timer
+const int LCD_Refresh = 200;                                 // LCD refresh rate in milliseconds
 
 // PID variables
 double Setpoint = 0.0;                           
@@ -30,8 +37,8 @@ double Output = 0.0;
 
 //PID Gains
 double Kp=1.8;
-double Ki=12;
-double Kd=0.2;
+double Ki=7.4;
+double Kd=0.215;
 
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);                   // PID library
 
@@ -52,6 +59,8 @@ void setup()
     
     myPID.SetMode(AUTOMATIC);                                                // PID auto/manual *TODO change with lcd button
     myPID.SetSampleTime(8.2);                                                // PID Loop time this is faster than 60Hz Double check
+    
+    lcd.begin(20, 4);                                                        // 2004 LCD size
     
     Serial.begin(9600);
 }
@@ -79,8 +88,26 @@ void loop() {
        analogWrite(ROUTER_PWM_OUTPIN, Output);               // Out to AC control Triac
        }
    
-      Serial.print("RPM = ");                                // Spindle, Display RPM
-      Serial.println(rpm_math);                              // Spindle, Display RPM
+    Serial.print("RPM = ");                                  // Spindle, Display RPM
+    Serial.println(rpm_math);                                // Spindle, Display RPM
+
+    current_lcd_time = millis();                             // LCD timer
+       
+    if (current_lcd_time - prev_lcd_time > LCD_Refresh){     // LCD check refresh rate
+       lcd.setCursor(3, 0);                                  // LCD position
+       lcd.print("V1 ENGINEERING");
+       lcd.setCursor(1, 2);
+       lcd.print("RPM");
+       lcd.setCursor(0, 3);
+      if (rpm_math > 0 ){                                    // LCD used to clear display at RPM=0
+         lcd.print(rpm_math);
+         }
+       else {
+         lcd.print("  0  ");
+       }
+       prev_lcd_time = current_lcd_time;                     // LCD timer reset
+       }
+    
 }
 
 // spindleRPM gets called on a falling edge of the PHOTO_PIN, and records the amount of time
