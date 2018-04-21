@@ -23,6 +23,7 @@ volatile unsigned long prev_time = 0;                // Marlin PWMms Math
 const int SPINDLE_ENABLE_PIN = 5;                    // Marlin Spindle enabled pin 
 
 const int ROUTER_PWM_OUTPIN = 6;                     // Triac output to router
+int triac_scaled;                                    // Traic is not 0-255
 
 const int rs = 11, en = 12, d4 = 10, d5 = 9, d6 = 8, d7 = 7; // Initialize LCD pins
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);                   // LCD library pins
@@ -43,7 +44,7 @@ double Kd=0.215;
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);                   // PID library
 
 const int MAX_TOOL_RPM = 30000;                                              // SETTINGS per "spindle" ?1k headroom needed?
-const int MAX_PWM_INPUT_US = 2024;                                           // Settings the microseconds of teh max PWM from Marlin.
+const int MAX_PWM_INPUT_US = 2024;                                           // Settings the microseconds of the max PWM from Marlin.
 
 void setup()
 {
@@ -85,11 +86,14 @@ void loop() {
        rpm_value = US_PERIOD_TO_RPM;                         // Disregards the spindown but clears the PID
        }
     else {                                                   // If spindle is enabled write PID value to triac
+       triac_scaled = map(Output, 0, 255, 20, 240);          // Traic scaling 20-240
        analogWrite(ROUTER_PWM_OUTPIN, Output);               // Out to AC control Triac
        }
    
     Serial.print("RPM = ");                                  // Spindle, Display RPM
     Serial.println(rpm_math);                                // Spindle, Display RPM
+    Serial.print("PWM In = ");                               // PWM In debug
+    Serial.println(pwm_value);                               // PWM In Debug
 
     current_lcd_time = millis();                             // LCD timer
        
