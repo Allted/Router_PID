@@ -37,9 +37,9 @@ double Input = 0.0;
 double Output = 0.0;
 
 //PID Gains
-double Kp=1.8;
-double Ki=7.4;
-double Kd=0.215;
+double Kp=2.1;
+double Ki=7;
+double Kd=0.025;
 
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);                   // PID library
 
@@ -92,8 +92,8 @@ void loop() {
    
     Serial.print("RPM = ");                                  // Spindle, Display RPM
     Serial.println(rpm_math);                                // Spindle, Display RPM
-    Serial.print("PWM In = ");                               // PWM In debug
-    Serial.println(pwm_value);                               // PWM In Debug
+   // Serial.print("PWM In = ");                               // PWM In debug
+   // Serial.println(pwm_value);                               // PWM In Debug
 
     current_lcd_time = millis();                             // LCD timer
        
