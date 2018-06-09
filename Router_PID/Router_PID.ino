@@ -127,7 +127,7 @@ void spindleRPM() {
    prev_rpm_time = current_rpm_time;
 
    // Call this function on the next falling edge.
-   attachInterrupt(digitalPinToInterrupt(PHOTO_PIN), spindleRPM, FALLING);
+   //attachInterrupt(digitalPinToInterrupt(PHOTO_PIN), spindleRPM, FALLING);
    }
 
 // rising() is called on the rising edge of the PHOTO_PIN. Basically starts the timer for measuring the
