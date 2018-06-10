@@ -22,7 +22,7 @@ volatile unsigned long prev_time = 0;                // Marlin PWMms Math
 
 const int SPINDLE_ENABLE_PIN = 5;                    // Marlin Spindle enabled pin 
 
-const int ROUTER_PWM_OUTPIN = 6;                     // Triac output to router
+const int ROUTER_PWM_OUTPIN = 9;                     // Triac output to router
 int triac_scaled;                                    // Traic is not 0-255
 
 const int rs = 11, en = 12, d4 = 10, d5 = 9, d6 = 8, d7 = 7; // Initialize LCD pins
