@@ -86,7 +86,7 @@ void loop() {
        rpm_value = US_PERIOD_TO_RPM;                         // Disregards the spindown but clears the PID
        }
     else {                                                   // If spindle is enabled write PID value to triac
-       triac_scaled = map(Output, 0, 255, 20, 240);          // Traic scaling 20-240
+       triac_scaled = map(Output, 0, 255, 0, 255);          // Traic scaling 20-240 not needed? test/tune
        analogWrite(ROUTER_PWM_OUTPIN, Output);               // Out to AC control Triac
        }
    
