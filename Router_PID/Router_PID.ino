@@ -11,12 +11,12 @@
 
 const long US_PERIOD_TO_RPM = 60000000;              // Convert from us of one rotation to RPM.
 
-const int PHOTO_PIN = 3;                             // Spindle IR Sensor input pin
+const int PHOTO_PIN = 2;                             // Spindle IR Sensor input pin
 volatile unsigned long current_rpm_time = 0;         // Spindle RPM PWM input calc
 volatile unsigned long prev_rpm_time = 0;            // Spindle RPM PWM input calc
 volatile unsigned long rpm_value = US_PERIOD_TO_RPM; // Spindle RPM input in microseconds
 
-const int PWM_PIN = 2;                               // Marlin PWMms Input pin
+const int PWM_PIN = 3;                               // Marlin PWMms Input pin
 volatile unsigned long pwm_value = 0;                // Marlin PWMms value in microseconds
 volatile unsigned long prev_time = 0;                // Marlin PWMms Math
 
