@@ -20,7 +20,7 @@ const int PWM_PIN = 3;                               // Marlin PWMms Input pin
 volatile unsigned long pwm_value = 0;                // Marlin PWMms value in microseconds
 volatile unsigned long prev_time = 0;                // Marlin PWMms Math
 
-const int SPINDLE_ENABLE_PIN = 5;                    // Marlin Spindle enabled pin 
+const int SPINDLE_ENABLE_PIN = 5;                    // Marlin Spindle enabled pin 4 doesn't work
 
 const int ROUTER_PWM_OUTPIN = 9;                     // Triac output to router pin 10, 11 do not work
 int triac_scaled;                                    // Traic is not 0-255
