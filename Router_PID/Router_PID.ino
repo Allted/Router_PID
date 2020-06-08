@@ -44,7 +44,7 @@ double Kd=0.025;
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);                   // PID library
 
 const int MAX_TOOL_RPM = 30000;                                              // SETTINGS per "spindle" ?1k headroom needed?
-const int MAX_PWM_INPUT_US = 2024;                                           // Settings the microseconds of the max PWM from Marlin.
+volatile int MAX_PWM_INPUT_US = -1;                                                    // Settings the microseconds of the max PWM from Marlin.
 
 void setup()
 {
@@ -84,6 +84,8 @@ void loop() {
        pwm_value = 0;                                        // Reset PID
        analogWrite(ROUTER_PWM_OUTPIN, 0);                    // Turn off Spindle AC
        rpm_value = US_PERIOD_TO_RPM;                         // Disregards the spindown but clears the PID
+       MAX_PWM_INPUT_US = -1;                                // Reset detected maximum input pulse to autodetect again.
+       prev_time = 0;
        }
     else {                                                   // If spindle is enabled write PID value to triac
        triac_scaled = map(Output, 0, 255, 0, 255);           // Traic scaling 20-240 not needed? test/tune
@@ -130,8 +132,12 @@ void spindleRPM() {
 // rising() is called on the rising edge of the PHOTO_PIN. Basically starts the timer for measuring the
 // PWM duty cycle. ISR.
 void rising() {
+   unsigned long new_pulse = micros();
    // Capture when this is rising.
-   prev_time = micros();
+   if (MAX_PWM_INPUT_US == -1 && prev_time != 0) {
+     MAX_PWM_INPUT_US = (new_pulse-prev_time)*.99;
+   }
+   prev_time = new_pulse;
 
    // Set the next interrupt.
    attachInterrupt(digitalPinToInterrupt(PWM_PIN), falling, FALLING);
