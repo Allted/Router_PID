@@ -130,12 +130,13 @@ void spindleRPM() {
 // rising() is called on the rising edge of the PHOTO_PIN. Basically starts the timer for measuring the
 // PWM duty cycle. ISR.
 void rising() {
-   int new_pulse = micros();
+   // Ideally we store micros() in a local variable and use it instead of calling again but this is breaking things. 
+   // int new_pulse = micros();
    // Capture when this is rising.
    if (MAX_PWM_INPUT_US == 0 && prev_time != 0) {
-     MAX_PWM_INPUT_US = (new_pulse-prev_time)*.99;
+     MAX_PWM_INPUT_US = (micros()-prev_time)*.99;
    }
-   prev_time = new_pulse;
+   prev_time = micros();
 
    // Set the next interrupt.
    attachInterrupt(digitalPinToInterrupt(PWM_PIN), falling, FALLING);
