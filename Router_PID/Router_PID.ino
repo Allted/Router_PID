@@ -44,7 +44,7 @@ double Kd=0.025;
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);                   // PID library
 
 const int MAX_TOOL_RPM = 30000;                                              // SETTINGS per "spindle" ?1k headroom needed?
-int MAX_PWM_INPUT_US = 0;                                                    // Settings the microseconds of the max PWM from Marlin.
+volatile int MAX_PWM_INPUT_US = -1;                                                    // Settings the microseconds of the max PWM from Marlin.
 
 void setup()
 {
@@ -84,6 +84,8 @@ void loop() {
        pwm_value = 0;                                        // Reset PID
        analogWrite(ROUTER_PWM_OUTPIN, 0);                    // Turn off Spindle AC
        rpm_value = US_PERIOD_TO_RPM;                         // Disregards the spindown but clears the PID
+       MAX_PWM_INPUT_US = -1;                                // Reset detected maximum input pulse to autodetect again.
+       prev_time = 0;
        }
     else {                                                   // If spindle is enabled write PID value to triac
        triac_scaled = map(Output, 0, 255, 0, 255);           // Traic scaling 20-240 not needed? test/tune
@@ -133,7 +135,7 @@ void rising() {
    // Ideally we store micros() in a local variable and use it instead of calling again but this is breaking things. 
    // int new_pulse = micros();
    // Capture when this is rising.
-   if (MAX_PWM_INPUT_US == 0 && prev_time != 0) {
+   if (MAX_PWM_INPUT_US == -1 && prev_time != 0) {
      MAX_PWM_INPUT_US = (micros()-prev_time)*.99;
    }
    prev_time = micros();
